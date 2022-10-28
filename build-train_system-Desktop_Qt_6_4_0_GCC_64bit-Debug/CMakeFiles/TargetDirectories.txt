@@ -1,0 +1,8 @@
+/media/routhleck/Windows-SSD/Users/Routhleck/Documents/GitHub/c++_project/build-train_system-Desktop_Qt_6_4_0_GCC_64bit-Debug/CMakeFiles/train_system.dir
+/media/routhleck/Windows-SSD/Users/Routhleck/Documents/GitHub/c++_project/build-train_system-Desktop_Qt_6_4_0_GCC_64bit-Debug/CMakeFiles/edit_cache.dir
+/media/routhleck/Windows-SSD/Users/Routhleck/Documents/GitHub/c++_project/build-train_system-Desktop_Qt_6_4_0_GCC_64bit-Debug/CMakeFiles/rebuild_cache.dir
+/media/routhleck/Windows-SSD/Users/Routhleck/Documents/GitHub/c++_project/build-train_system-Desktop_Qt_6_4_0_GCC_64bit-Debug/CMakeFiles/list_install_components.dir
+/media/routhleck/Windows-SSD/Users/Routhleck/Documents/GitHub/c++_project/build-train_system-Desktop_Qt_6_4_0_GCC_64bit-Debug/CMakeFiles/install.dir
+/media/routhleck/Windows-SSD/Users/Routhleck/Documents/GitHub/c++_project/build-train_system-Desktop_Qt_6_4_0_GCC_64bit-Debug/CMakeFiles/install/local.dir
+/media/routhleck/Windows-SSD/Users/Routhleck/Documents/GitHub/c++_project/build-train_system-Desktop_Qt_6_4_0_GCC_64bit-Debug/CMakeFiles/install/strip.dir
+/media/routhleck/Windows-SSD/Users/Routhleck/Documents/GitHub/c++_project/build-train_system-Desktop_Qt_6_4_0_GCC_64bit-Debug/CMakeFiles/train_system_autogen.dir
