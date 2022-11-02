@@ -1,15 +1,19 @@
 #include"station.h"
 
-station::station(int id, double position)
-{
-    this->id_station = id_station;
-    this->position = position;
+station::station() {
+    stationNode* _dummyHead = new stationNode(0, 0);
+    station_num = 0;
 }
 
-station::~station()
-{
+void station::set_station(int id, double position) {
+    stationNode* p = _dummyHead;
+    while (p->next != nullptr) {
+        p = p->next;
+    }
+    p->next = new stationNode(id, position);
+    station_num++;
 }
 
 station station::get_station_by_id(int id_station){
-    
+
 }

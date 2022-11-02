@@ -7,13 +7,24 @@
 
 class station
 {
-private:
-    int id_station;
-    double position;
 public:
-    station(int id, double position);
+    struct stationNode{
+        int id_station;
+        double position;
+        stationNode *next;
+        stationNode(int id_station, double position, stationNode *next = nullptr)
+            :id_station(id_station), position(position), next(next){}
+    };
+    
+    station();
     ~station();
+    void set_station(int id, double position);
     station get_station_by_id(int id_station);
+    
+private:
+    stationNode* _dummyHead;
+    int station_num;
+
 };
 
 
