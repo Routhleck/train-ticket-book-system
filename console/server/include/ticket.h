@@ -25,6 +25,11 @@ public:
         std::cout << "终点站：" << ticket_end << std::endl;
         std::cout << "车票价格：" << ticket_price << std::endl;
     }
+    int get_ticket_id() const { return ticket_id; }
+    int get_train_id() const { return train_id; }
+    int get_ticket_start() const { return ticket_start; }
+    int get_ticket_end() const { return ticket_end; }
+    int get_ticket_price() const { return ticket_price; }
 
 private:
     int ticket_id; // 车票id

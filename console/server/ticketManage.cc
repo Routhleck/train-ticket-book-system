@@ -1,4 +1,4 @@
-#include "ticketManage.h"
+#include "include/ticketManage.h"
 
 int getTrainId(int ticket_start, int ticket_end, int station_amount, std::vector<train>& train_vector) {
 
@@ -13,81 +13,53 @@ int getTrainId(int ticket_start, int ticket_end, int station_amount, std::vector
     if (ticket_start < ticket_end) {
         train_direction = 1;
     }
-    // 判断该车票的等级
-    int ticket_level = 0;
-    int short_distance = station_amount / 3;
-    int medium_distance = station_amount * 2 / 3;
-    if (abs(ticket_end - ticket_start) <= short_distance) {
-        ticket_level = 1;
-    }
-    else if (abs(ticket_end - ticket_start) <= medium_distance) {
-        ticket_level = 2;
-    }
-    else {
-        ticket_level = 3;
-    }
+    // 判断该车票的距离
+    int ticket_distance = abs(ticket_end - ticket_start);
     // 选择符合条件的车次
-    int train_id = findTrainId(train_direction, ticket_start, ticket_end, ticket_level, train_vector);
+    int train_id = findTrainId(train_direction, ticket_start, ticket_end, ticket_distance, train_vector);
     return train_id;
 }
 
-std::vector<train> sortByLevel(std::vector<train> train_vector, int target_level) {
-    std::cout << target_level << std::endl;
-    // 按照车次等级排序
+std::vector<train> sortByLevel(std::vector<train> train_vector, int target_distance) {
+    // std::cout << target_distance << std::endl;
+    // 按照车次距离排序
     std::vector<train> train_vector_level;
-    // 若level为1, 则按照车次level从1到3排序
-    if (target_level == 1) {
-        for (int i = 0; i < train_vector.size(); i++) {
-            if (train_vector[i].get_train_level() == 1) {
-                train_vector_level.push_back(train_vector[i]);
-            }
-        }
-        for (int i = 0; i < train_vector.size(); i++) {
-            if (train_vector[i].get_train_level() == 2) {
-                train_vector_level.push_back(train_vector[i]);
-            }
-        }
-        for (int i = 0; i < train_vector.size(); i++) {
-            if (train_vector[i].get_train_level() == 3) {
-                train_vector_level.push_back(train_vector[i]);
-            }
+    // 取大于等于target_distance的车次，从小到大排序
+    for (int i = 0; i < train_vector.size(); i++) {
+        if (train_vector[i].get_train_distance() >= target_distance) {
+            train_vector_level.push_back(train_vector[i]);
         }
     }
-    // 若level为2, 则按照车次level从2到3排序
-    else if (target_level == 2) {
-        for (int i = 0; i < train_vector.size(); i++) {
-            if (train_vector[i].get_train_level() == 2) {
-                train_vector_level.push_back(train_vector[i]);
-            }
-        }
-        for (int i = 0; i < train_vector.size(); i++) {
-            if (train_vector[i].get_train_level() == 3) {
-                train_vector_level.push_back(train_vector[i]);
-            }
-        }
-    }
-    // 若level为3, 则选取车次level为3的车次
-    else {
-        for (int i = 0; i < train_vector.size(); i++) {
-            if (train_vector[i].get_train_level() == 3) {
-                train_vector_level.push_back(train_vector[i]);
+    // 从小到大排序
+    for (int i = 0; i < train_vector_level.size(); i++) {
+        for (int j = i + 1; j < train_vector_level.size(); j++) {
+            if (train_vector_level[i].get_train_distance() > train_vector_level[j].get_train_distance()) {
+                train temp = train_vector_level[i];
+                train_vector_level[i] = train_vector_level[j];
+                train_vector_level[j] = temp;
             }
         }
     }
     return train_vector_level;
 }
 
-int findTrainId(int train_direction, int train_start, int train_end, int train_level, std::vector<train>& train_vector) {
+int findTrainId(int train_direction, int train_start, int train_end, int train_distance, std::vector<train>& train_vector) {
     std::vector<train> temp_train;
-    // 按照车次等级排序
-    temp_train = sortByLevel(train_vector, train_level);
+    // 按照车次距离排序
+    temp_train = sortByLevel(train_vector, train_distance);
     // 找到符合条件的车次
     for (int i = 0; i < temp_train.size(); i++) {
         if (temp_train[i].get_train_direction() == train_direction) {
             if (train_direction == 1) {
                 if (temp_train[i].get_train_start() <= train_start) {
                     if (temp_train[i].get_train_end() >= train_end) {
-                        return temp_train[i].get_train_id();
+                        if (temp_train[i].get_train_passenger_now() == temp_train[i].get_train_passenger_capcacity()) {
+                            // std::cout << "该车次已满" << std::endl;
+                            continue;
+                        }
+                        else {
+                            return temp_train[i].get_train_id();
+                        }
                     }
                 }
             }
@@ -120,11 +92,49 @@ void addTicket(int& ticket_num, int ticket_start, int ticket_end, int station_am
             // 生成车票
             ticket new_ticket(ticket_num, ticket_id, ticket_start, ticket_end, start, end, train_vector[i]);
             // 打印车票
-            new_ticket.print_ticket();
+            // new_ticket.print_ticket();
 
             ticket_vector.push_back(new_ticket);
             ticket_num++;
             break;
+        }
+    }
+}
+
+// 退票
+void deleteTicket(int ticket_id, std::vector<ticket>& ticket_vector, std::vector<train>& train_vector) {
+    // 寻找到符合的车票
+    for (int i = 0; i < ticket_vector.size(); i++) {
+        if (ticket_vector[i].get_ticket_id() == ticket_id) {
+            // 找到对应的车次
+            for (int j = 0; j < train_vector.size(); j++) {
+                if (train_vector[j].get_train_id() == ticket_vector[i].get_train_id()) {
+                    // 乘客数-1
+                    train_vector[j].sub_train_passenger_now();
+                    break;
+                }
+            }
+            // 删除车票
+            ticket_vector.erase(ticket_vector.begin() + i);
+            std::cout << "退票成功" << std::endl;
+            return;
+        }
+        // 若没有找到符合的车票
+        if (i == ticket_vector.size() - 1) {
+            std::cout << "没有找到符合的车票" << std::endl;
+            return;
+        }
+    }
+}
+
+// 查看余票
+void checkTicket (std::vector<train>& train_vector) {
+    for (int i = 0; i < train_vector.size(); i++) {
+        if (train_vector[i].get_train_passenger_now() < train_vector[i].get_train_passenger_capcacity()) {
+            std::cout << "车次" << train_vector[i].get_train_id() << "有余票" << train_vector[i].get_train_passenger_capcacity() - train_vector[i].get_train_passenger_now() << "张" << std::endl;
+        }
+        else {
+            std::cout << "车次" << train_vector[i].get_train_id() << "无余票" << std::endl;
         }
     }
 }

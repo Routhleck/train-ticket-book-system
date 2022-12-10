@@ -8,15 +8,21 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <sys/shm.h>
+#include <iostream>
+#include <string.h>
 
 #define MYPORT  7000
 #define BUFFER_SIZE 1024
+
+
 int main()
 {
     int sock_cli;
     fd_set rfds;
     struct timeval tv;
     int retval, maxfd;
+    int command = 0;
+    char data[30];
 
     ///定义sockfd
     sock_cli = socket(AF_INET,SOCK_STREAM, 0);
@@ -46,15 +52,16 @@ int main()
         if(maxfd < sock_cli)
             maxfd = sock_cli;
         /*设置超时时间*/
-        tv.tv_sec = 5;
+        tv.tv_sec = 500;
         tv.tv_usec = 0;
         /*等待聊天*/
+        std::cout << "请输入操作：\n 1.订票\t2.退票\t3.余票查询" << std::endl;
         retval = select(maxfd+1, &rfds, NULL, NULL, &tv);
         if(retval == -1){
             printf("select出错，客户端程序退出\n");
             break;
         }else if(retval == 0){
-            printf("客户端没有任何输入信息，并且服务器也没有信息到来，waiting...\n");
+            // printf("客户端没有任何输入信息，并且服务器也没有信息到来，waiting...\n");
             continue;
         }else{
             /*服务器发来了消息*/
@@ -67,12 +74,43 @@ int main()
             }
             /*用户输入信息了,开始处理信息并发送*/
             if(FD_ISSET(0, &rfds)){
+                bool flag = true;
+                std::cin >> command;
+                // 忽略回车
+                std::cin.ignore();
+                switch (command) {
+                case 1:
+                    std::cout << "请输入订票信息，格式为(出发站点id 到达站点id)" << std::endl;
+                    std::cin.getline(data, 30);
+                    break;
+                case 2:
+                    std::cout << "请输入退票id" << std::endl;
+                    std::cin.getline(data, 30);
+                    break;
+                case 3:
+                    /* code */
+                    break;
+                default:
+                    std::cout << "输入错误" << std::endl;
+                    break;
+                }
                 char sendbuf[BUFFER_SIZE];
-                fgets(sendbuf, sizeof(sendbuf), stdin);
+                char command_char[10];
+                sprintf(command_char, "%d", command);
+                // 将command与data拼接给sendbuf赋值
+                std::string str = "";
+                str += command_char;
+                str += " ";
+                str += data;
+                strcpy(sendbuf, str.c_str());
+                std::cout << sendbuf << std::endl;
                 send(sock_cli, sendbuf, strlen(sendbuf),0); //发送
                 memset(sendbuf, 0, sizeof(sendbuf));
+                
             }
         }
+        continue;
+        
     }
 
     close(sock_cli);
