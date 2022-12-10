@@ -1,6 +1,7 @@
 #include "include/ticketManage.h"
+#include <string.h>
 
-int getTrainId(int ticket_start, int ticket_end, int station_amount, std::vector<train>& train_vector) {
+int getTrainId(int ticket_start, int ticket_end, std::vector<train>& train_vector) {
 
     // 若始发地与终点相同，返回错误
     if (ticket_start == ticket_end) {
@@ -76,10 +77,10 @@ int findTrainId(int train_direction, int train_start, int train_end, int train_d
     return -1;
 }
 
-void addTicket(int& ticket_num, int ticket_start, int ticket_end, int station_amount, std::vector<train>& train_vector, std::vector<ticket>& ticket_vector, std::vector<station>& station_vector) {
-    int ticket_id = getTrainId(ticket_start, ticket_end, station_amount, train_vector);
+bool addTicket(int user_id, int& ticket_num, int ticket_start, int ticket_end, std::vector<train>& train_vector, std::vector<ticket>& ticket_vector, std::vector<station>& station_vector) {
+    int ticket_id = getTrainId(ticket_start, ticket_end, train_vector);
     if (ticket_id == -1) {
-        return;
+        return false;
     }
     station start = station_vector[ticket_start - 1];
     station end = station_vector[ticket_end - 1];
@@ -90,7 +91,7 @@ void addTicket(int& ticket_num, int ticket_start, int ticket_end, int station_am
             // 乘客数+1
             train_vector[i].add_train_passenger_now();
             // 生成车票
-            ticket new_ticket(ticket_num, ticket_id, ticket_start, ticket_end, start, end, train_vector[i]);
+            ticket new_ticket(ticket_num, ticket_id, user_id, ticket_start, ticket_end, start, end, train_vector[i]);
             // 打印车票
             // new_ticket.print_ticket();
 
@@ -99,13 +100,14 @@ void addTicket(int& ticket_num, int ticket_start, int ticket_end, int station_am
             break;
         }
     }
+    return true;
 }
 
 // 退票
-void deleteTicket(int ticket_id, std::vector<ticket>& ticket_vector, std::vector<train>& train_vector) {
+bool deleteTicket(int user_id, int ticket_id, std::vector<ticket>& ticket_vector, std::vector<train>& train_vector) {
     // 寻找到符合的车票
     for (int i = 0; i < ticket_vector.size(); i++) {
-        if (ticket_vector[i].get_ticket_id() == ticket_id) {
+        if (ticket_vector[i].get_ticket_id() == ticket_id && ticket_vector[i].get_user_id() == user_id) {
             // 找到对应的车次
             for (int j = 0; j < train_vector.size(); j++) {
                 if (train_vector[j].get_train_id() == ticket_vector[i].get_train_id()) {
@@ -117,24 +119,43 @@ void deleteTicket(int ticket_id, std::vector<ticket>& ticket_vector, std::vector
             // 删除车票
             ticket_vector.erase(ticket_vector.begin() + i);
             std::cout << "退票成功" << std::endl;
-            return;
+            return true;
         }
         // 若没有找到符合的车票
         if (i == ticket_vector.size() - 1) {
             std::cout << "没有找到符合的车票" << std::endl;
-            return;
+            return false;
+        }
+    }
+    return false;
+}
+
+// 查看余票
+void checkRestTicket (char* buffer,std::vector<train>& train_vector) {
+    char temp[100] = "";
+    for (int i = 0; i < train_vector.size(); i++) {
+        if (train_vector[i].get_train_passenger_now() < train_vector[i].get_train_passenger_capcacity()) {
+            std::cout << "车次" << train_vector[i].get_train_id() << "有余票" << train_vector[i].get_train_passenger_capcacity() - train_vector[i].get_train_passenger_now() << "张" << std::endl;
+            sprintf(temp, "车次 %d 有余票 %d 张, 票价: %.2lf/单位距离\n", train_vector[i].get_train_id(), train_vector[i].get_train_passenger_capcacity() - train_vector[i].get_train_passenger_now(), train_vector[i].get_train_price());
+            strcat(buffer, temp);
+        }
+        else {
+            std::cout << "车次" << train_vector[i].get_train_id() << "无余票" << std::endl;
+            sprintf(temp, "车次 %d 无余票\n", train_vector[i].get_train_id());
+            strcat(buffer, temp);
         }
     }
 }
 
-// 查看余票
-void checkTicket (std::vector<train>& train_vector) {
-    for (int i = 0; i < train_vector.size(); i++) {
-        if (train_vector[i].get_train_passenger_now() < train_vector[i].get_train_passenger_capcacity()) {
-            std::cout << "车次" << train_vector[i].get_train_id() << "有余票" << train_vector[i].get_train_passenger_capcacity() - train_vector[i].get_train_passenger_now() << "张" << std::endl;
-        }
-        else {
-            std::cout << "车次" << train_vector[i].get_train_id() << "无余票" << std::endl;
+// 查看自己购票
+void checkBuyTicket(int user_id, char* buffer, std::vector<ticket>& ticket_vector) {
+    char temp[100] = "";
+    for (int i = 0; i < ticket_vector.size(); i++) {
+        if (ticket_vector[i].get_user_id() == user_id) {
+            printf("车票id:%d|车票车次id:%d|始发站id:%d|终点站id:%d|票价:%d\n", ticket_vector[i].get_ticket_id(), ticket_vector[i].get_train_id(), ticket_vector[i].get_ticket_start(), ticket_vector[i].get_ticket_end(), ticket_vector[i].get_ticket_price());
+
+            sprintf(temp, "车票id:%d|车票车次id:%d|始发站id:%d|终点站id:%d|票价:%d\n", ticket_vector[i].get_ticket_id(), ticket_vector[i].get_train_id(), ticket_vector[i].get_ticket_start(), ticket_vector[i].get_ticket_end(), ticket_vector[i].get_ticket_price());
+            strcat(buffer, temp);        
         }
     }
 }

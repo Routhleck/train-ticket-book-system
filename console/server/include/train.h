@@ -4,7 +4,7 @@
 #include <iostream>
 class train {
 public:
-    train(int train_id, int train_start, int train_end, int train_passenger_capcacity, double train_price, int station_amount):
+    train(int train_id, int train_start, int train_end, int train_passenger_capcacity, double train_price):
     train_id(train_id), train_start(train_start), train_end(train_end), train_passenger_capcacity(train_passenger_capcacity), train_price(train_price) 
     {
         // 判断车次的方向

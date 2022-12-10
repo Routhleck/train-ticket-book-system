@@ -10,13 +10,18 @@
 #include <sys/shm.h>
 #include <iostream>
 #include <string.h>
+#include <time.h>
 
-#define MYPORT  7000
+#define MYPORT  7001
 #define BUFFER_SIZE 1024
 
 
 int main()
 {
+    // 用户id初始化
+    int user_id = 0;
+    std::cout << "请输入用户id: ";
+    std::cin >> user_id;
     int sock_cli;
     fd_set rfds;
     struct timeval tv;
@@ -39,8 +44,15 @@ int main()
         perror("connect");
         exit(1);
     }
-
+    bool input = true;
+    bool exit_flag = false;
+    int exit_time = 2;
     while(1){
+        if (exit_flag == true) {
+            std::cout << "退出" << std::endl;
+            break;
+            
+        }
         /*把可读文件描述符的集合清空*/
         FD_ZERO(&rfds);
         /*把标准输入的文件描述符加入到集合中*/
@@ -55,7 +67,7 @@ int main()
         tv.tv_sec = 500;
         tv.tv_usec = 0;
         /*等待聊天*/
-        std::cout << "请输入操作：\n 1.订票\t2.退票\t3.余票查询" << std::endl;
+        if (input == true) std::cout << "请输入操作：\n 1:订票  2:退票  3:余票查询  4:购票查询  0:退出客户端" << std::endl;
         retval = select(maxfd+1, &rfds, NULL, NULL, &tv);
         if(retval == -1){
             printf("select出错，客户端程序退出\n");
@@ -71,6 +83,7 @@ int main()
                 len = recv(sock_cli, recvbuf, sizeof(recvbuf),0);
                 printf("%s", recvbuf);
                 memset(recvbuf, 0, sizeof(recvbuf));
+                input = true;
             }
             /*用户输入信息了,开始处理信息并发送*/
             if(FD_ISSET(0, &rfds)){
@@ -79,6 +92,9 @@ int main()
                 // 忽略回车
                 std::cin.ignore();
                 switch (command) {
+                case 0:
+                    exit_flag = true;
+                    break;
                 case 1:
                     std::cout << "请输入订票信息，格式为(出发站点id 到达站点id)" << std::endl;
                     std::cin.getline(data, 30);
@@ -88,7 +104,10 @@ int main()
                     std::cin.getline(data, 30);
                     break;
                 case 3:
-                    /* code */
+                    
+                    break;
+                case 4:
+                    
                     break;
                 default:
                     std::cout << "输入错误" << std::endl;
@@ -96,17 +115,17 @@ int main()
                 }
                 char sendbuf[BUFFER_SIZE];
                 char command_char[10];
-                sprintf(command_char, "%d", command);
+                sprintf(command_char, "%d %d", command, user_id);
                 // 将command与data拼接给sendbuf赋值
                 std::string str = "";
                 str += command_char;
                 str += " ";
                 str += data;
                 strcpy(sendbuf, str.c_str());
-                std::cout << sendbuf << std::endl;
+                // std::cout << sendbuf << std::endl;
                 send(sock_cli, sendbuf, strlen(sendbuf),0); //发送
                 memset(sendbuf, 0, sizeof(sendbuf));
-                
+                input = false;
             }
         }
         continue;
