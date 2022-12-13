@@ -1,5 +1,6 @@
-g++  ./server/ticketManage.cc -c
-mv ./ticketManage.o ./out/
-g++ ./out/ticketManage.o ./server/server.cc -o ./out/server.out
-g++ ./client/client.cc -o ./out/client.out
-g++ ./out/ticketManage.o ./server/test_algorithm.cc -o ./out/test_algorithm.out
+rm -rf out
+mkdir out
+g++ -g server/server.cc -o out/server server/ticketManage.cc
+g++ ./client/client.cc -o ./out/client
+g++ -g server/test_algorithm.cc -o out/test_algorithm server/ticketManage.cc
+cp ./server/ticket_data ./out/ticket_data

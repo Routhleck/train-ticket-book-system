@@ -9,7 +9,7 @@
 #include <fcntl.h>
 #include <sys/shm.h>
 #include <iostream>
-#define PORT 7001
+#define PORT 7000
 #define QUEUE 20
 
 #include "include/ticket.h"
@@ -122,7 +122,7 @@ int main() {
         perror("connect");
         exit(1);
     }
-    std::cout << "connect success!" << std::endl;
+    std::cout << "连接成功!" << std::endl;
     bool exit_flag = false;
     while(1) {
         if (exit_flag) break;
@@ -209,13 +209,21 @@ int main() {
                         send(conn, buffer4, sizeof(buffer4), 0);
                         break;
                     }
+                    case '5':
+                    {
+                        printf("站点查询\n");
+                        char buffer5[1024] = "";
+                        stationQuery(buffer5, stations);
+                        send(conn, buffer5, sizeof(buffer5), 0);
+                        break;
+                    }
                     default:
                     {
                         printf("客户端输入错误\n");
                         break;
                     }
                 }
-                
+                memset(buffer, 0, sizeof(buffer));
                 //send(conn, buffer, len , 0);把数据回发给客户端
             }
         }

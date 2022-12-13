@@ -1,7 +1,16 @@
 #include "include/ticketManage.h"
 #include <string.h>
 
-int getTrainId(int ticket_start, int ticket_end, std::vector<train>& train_vector) {
+void stationQuery(char *buffer, std::vector<station> &station_vector){
+    // 遍历所有站点，将站点信息写入buffer
+    for (int i = 0; i < station_vector.size(); i++) {
+        char temp[100];
+        sprintf(temp, "站点ip: %d|站点名: %s|站点位置: %lf\n", station_vector[i].get_station_id(), station_vector[i].get_station_name().c_str(), station_vector[i].get_station_position());
+        strcat(buffer, temp);
+    }
+}
+int getTrainId(int ticket_start, int ticket_end, std::vector<train> &train_vector)
+{
 
     // 若始发地与终点相同，返回错误
     if (ticket_start == ticket_end) {

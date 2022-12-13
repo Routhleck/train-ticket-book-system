@@ -12,7 +12,7 @@
 #include <string.h>
 #include <time.h>
 
-#define MYPORT  7001
+#define MYPORT  7000
 #define BUFFER_SIZE 1024
 
 
@@ -28,6 +28,7 @@ int main()
     int retval, maxfd;
     int command = 0;
     char data[30];
+    
 
     ///定义sockfd
     sock_cli = socket(AF_INET,SOCK_STREAM, 0);
@@ -67,7 +68,7 @@ int main()
         tv.tv_sec = 500;
         tv.tv_usec = 0;
         /*等待聊天*/
-        if (input == true) std::cout << "请输入操作：\n 1:订票  2:退票  3:余票查询  4:购票查询  0:退出客户端" << std::endl;
+        if (input == true) std::cout << "请输入操作：\n 1:订票  2:退票  3:余票查询  4:购票查询  5:站点查询  0:退出客户端" << std::endl;
         retval = select(maxfd+1, &rfds, NULL, NULL, &tv);
         if(retval == -1){
             printf("select出错，客户端程序退出\n");
@@ -97,6 +98,7 @@ int main()
                     break;
                 case 1:
                     std::cout << "请输入订票信息，格式为(出发站点id 到达站点id)" << std::endl;
+                    // 获取输入的字符串
                     std::cin.getline(data, 30);
                     break;
                 case 2:
@@ -108,6 +110,9 @@ int main()
                     break;
                 case 4:
                     
+                    break;
+                case 5:
+                        
                     break;
                 default:
                     std::cout << "输入错误" << std::endl;
@@ -124,6 +129,8 @@ int main()
                 strcpy(sendbuf, str.c_str());
                 // std::cout << sendbuf << std::endl;
                 send(sock_cli, sendbuf, strlen(sendbuf),0); //发送
+                // 清空data
+                memset(data, 0, sizeof(data));
                 memset(sendbuf, 0, sizeof(sendbuf));
                 input = false;
             }

@@ -1,6 +1,9 @@
 #ifndef TICKETMANAGE_H_H
 #define TICKETMANAGE_H_H
 #include "ticket.h"
+// 站点查询
+void stationQuery(char*buffer, std::vector<station>& station_vector);
+
 // 输入始发地与终点，返回车票信息
 int getTrainId(int ticket_start, int ticket_end, std::vector<train>& train_vector);
 
