@@ -79,6 +79,7 @@ void split_space(int *num, char *buffer) {
         i++;
     }
 }
+
 int main() {
     // 初始化station、train、ticket
     std::vector<station> stations;
